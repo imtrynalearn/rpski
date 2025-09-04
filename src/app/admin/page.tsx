@@ -1,8 +1,18 @@
 import { prisma } from "@/lib/prisma";
+import { env } from "@/lib/env";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export default async function AdminPage() {
+  if (!env.DATABASE_URL) {
+    return (
+      <div className="space-y-4">
+        <h1 className="text-2xl font-semibold">Admin (demo)</h1>
+        <p className="text-sm text-red-600">Database not configured. Set <code>DATABASE_URL</code> in your environment (e.g., .env or Vercel Project Settings) and reload.</p>
+      </div>
+    );
+  }
   const bookings = await prisma.booking.findMany({
     orderBy: { createdAt: "desc" },
     take: 20,
@@ -47,4 +57,3 @@ export default async function AdminPage() {
     </div>
   );
 }
-

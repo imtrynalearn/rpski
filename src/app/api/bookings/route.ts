@@ -16,11 +16,17 @@ const BookingRequest = z.object({
   notes: z.string().optional(),
 });
 
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
   try {
     const json = await req.json();
     const data = BookingRequest.parse(json);
     const provider = env.PAYMENTS_PROVIDER ?? "stripe";
+
+    if (!env.DATABASE_URL) {
+      return NextResponse.json({ error: "Database not configured. Set DATABASE_URL in your environment (e.g., .env or Vercel Project Settings)." }, { status: 500 });
+    }
 
     // Find the lesson type
     const lessonType = await prisma.lessonType.findFirst({
