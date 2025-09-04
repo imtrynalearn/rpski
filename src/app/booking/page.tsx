@@ -19,8 +19,17 @@ export default function BookingPage() {
     setError(null);
     const form = e.currentTarget;
     const formData = new FormData(form);
-    const payload = Object.fromEntries(formData.entries());
-    payload.students = Number(payload.students || 1);
+    const payload = {
+      type: String(formData.get("type") || ""),
+      date: String(formData.get("date") || ""),
+      time: String(formData.get("time") || ""),
+      students: Number(formData.get("students") || 1),
+      level: formData.get("level") ? String(formData.get("level")) : undefined,
+      name: String(formData.get("name") || ""),
+      email: String(formData.get("email") || ""),
+      phone: formData.get("phone") ? String(formData.get("phone")) : undefined,
+      notes: formData.get("notes") ? String(formData.get("notes")) : undefined,
+    };
     try {
       const res = await fetch("/api/bookings", {
         method: "POST",
