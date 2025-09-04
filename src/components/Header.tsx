@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Route } from "next";
 
-const nav = [
+const nav: { href: Route; label: string }[] = [
   { href: "/", label: "Home" },
   { href: "/lessons", label: "Lessons" },
   { href: "/booking", label: "Book" },
@@ -45,4 +46,3 @@ export function Header() {
     </header>
   );
 }
-
