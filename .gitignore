@@ -1,43 +1,23 @@
-# OS
-.DS_Store
+# Dependencies and builds
+node_modules
+.next
+out
+dist
+build
 
-# Node
-node_modules/
+# Env and local config
+.env
+.env.*
+.vercel
+
+# OS / editor
+.DS_Store
+.idea
+.vscode/
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-
-# TypeScript
-*.tsbuildinfo
-
-# Next.js
-.next/
-out/
-
-# Build output
-/dist/
-/.turbo/
-
-# Vercel
-.vercel/
-
-# Env files (keep example tracked)
-.env
-.env.local
-.env.*.local
-.env.development
-.env.test
-.env.production
-!.env.example
-
-# Prisma (file-based dbs)
-prisma/*.db
-prisma/*.sqlite
-
-# Coverage
-coverage/
-.nyc_output/
-
-# Misc
 *.log
+

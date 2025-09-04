@@ -46,12 +46,54 @@ Steps
      - Temporarily set DATABASE_URL locally to the Neon URL
      - Run: `npx prisma generate && npx prisma migrate deploy && npx tsx prisma/seed.ts`
 
+### Neon connection tips (Prisma)
+- Prefer the “Direct” connection string (host does NOT include `-pooler`) for migrations; ensure `sslmode=require`.
+- If you keep using the pooler (PgBouncer in transaction mode), append `pgbouncer=true` and keep `sslmode=require`:
+   - Example: `postgresql://USER:PASSWORD@POOLER_HOST:5432/DB?sslmode=require&schema=public&pgbouncer=true`
+- For best of both worlds, set runtime to pooler and migrations to direct using a shadow DB URL:
+
+Add to `.env` (values from Neon → “Direct”):
+```
+SHADOW_DATABASE_URL="postgresql://USER:PASSWORD@DIRECT_HOST:5432/DB?sslmode=require&schema=public"
+```
+
+Then in `prisma/schema.prisma`:
+```
+datasource db {
+   provider          = "postgresql"
+   url               = env("DATABASE_URL")
+   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+```
+This prevents Prisma Migrate from hanging behind PgBouncer transaction pooling.
+
 ## Stripe webhook (only if using Stripe)
 - In production: Stripe → Developers → Webhooks → Add endpoint: https://<your-project>.vercel.app/api/stripe/webhook
 - Copy the signing secret to STRIPE_WEBHOOK_SECRET in Vercel env vars and redeploy.
 
-## Custom test domain (optional)
-- In Vercel → Domains → Add your domain (e.g., staging.example.com). Update DNS per Vercel’s instructions. HTTPS is auto-provisioned.
+## Custom domain on Namecheap (optional but recommended)
+You can keep the default `*.vercel.app` URL, or add your own domain/subdomain from Namecheap.
+
+1) Add the domain in Vercel
+- Vercel Project → Settings → Domains → Add. Enter either:
+   - A subdomain like `staging.example.com`, or
+   - Your apex/root, e.g., `example.com` (plus add `www`).
+
+2) Configure DNS in Namecheap
+- Namecheap → Domain List → Manage → Advanced DNS.
+- For a subdomain (easiest):
+   - Add a CNAME record: Host = the subdomain (e.g., `staging`), Value = `cname.vercel-dns.com`, TTL = Automatic.
+- For the apex domain (root): you have two options:
+   - Point A record to Vercel’s edge: Add an A record, Host = `@`, Value = `76.76.21.21`, TTL = Automatic.
+   - Also add a CNAME for `www` → `cname.vercel-dns.com` so `www.example.com` works.
+   - Alternatively, switch nameservers to Vercel and manage DNS there (optional; Vercel will provide nameserver values).
+
+3) Verify domain in Vercel
+- Return to Vercel Domains page and click “Refresh”. Once DNS propagates, it will show as Verified, and SSL will be auto-provisioned.
+- Set your preferred domain as “Primary”.
+
+4) Update environment
+- Set `NEXT_PUBLIC_BASE_URL=https://<your-domain>` in Vercel env vars and redeploy so redirects/webhooks use the correct domain.
 
 ## Build tips and reliability
 - This repo includes a `postinstall` script to generate Prisma client on the server.
