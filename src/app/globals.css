@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Apple-like minimal base */
+:root {
+  --bg: #ffffff;
+  --fg: #0A0A0A;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-feature-settings: "ss01" on, "ss02" on, "cv01" on, "cv02" on;
+}
+
+/* Smooth focus visible */
+*:focus-visible {
+  outline: 2px solid theme(colors.ice.500);
+  outline-offset: 2px;
+}
+
+/* Links */
+a {
+  @apply text-ink-900 transition-colors duration-fast ease-smooth;
+}
+a:hover {
+  @apply text-ink-700;
+}
+
+/* Containers */
+.card {
+  @apply rounded-xl border border-gray-200 bg-white shadow-subtle hover:shadow md:transition-shadow duration-fast ease-smooth;
+}
+

@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  pending
+  paid
+  canceled
+}
+
+model LessonType {
+  id           Int      @id @default(autoincrement())
+  name         String
+  description  String?
+  durationMin  Int
+  basePriceCents Int
+  groupMax     Int?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  timeSlots    TimeSlot[]
+}
+
+model TimeSlot {
+  id            Int        @id @default(autoincrement())
+  lessonTypeId  Int
+  start         DateTime
+  end           DateTime
+  capacity      Int
+  bookedCount   Int        @default(0)
+  status        String     @default("open")
+
+  lessonType    LessonType @relation(fields: [lessonTypeId], references: [id])
+  bookingItems  BookingItem[]
+
+  @@index([lessonTypeId, start])
+}
+
+model Booking {
+  id                     String         @id @default(cuid())
+  customerName           String
+  customerEmail          String
+  customerPhone          String?
+  notes                  String?
+  status                 BookingStatus  @default(pending)
+  totalCents             Int            @default(0)
+  currency               String         @default("usd")
+  stripeSessionId        String?
+  stripePaymentIntentId  String?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+
+  items                  BookingItem[]
+  payments               Payment[]
+
+  @@index([status, createdAt])
+}
+
+model BookingItem {
+  id          Int      @id @default(autoincrement())
+  bookingId   String
+  timeSlotId  Int
+  students    Int      @default(1)
+  level       String?
+
+  booking     Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  timeSlot    TimeSlot  @relation(fields: [timeSlotId], references: [id])
+
+  @@unique([bookingId, timeSlotId])
+}
+
+model Payment {
+  id         Int      @id @default(autoincrement())
+  bookingId  String
+  provider   String   @default("fake")
+  cardBrand  String?
+  cardLast4  String?
+  expMonth   Int?
+  expYear    Int?
+  createdAt  DateTime @default(now())
+
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+}

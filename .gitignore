@@ -1,0 +1,43 @@
+# OS
+.DS_Store
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# Next.js
+.next/
+out/
+
+# Build output
+/dist/
+/.turbo/
+
+# Vercel
+.vercel/
+
+# Env files (keep example tracked)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+!.env.example
+
+# Prisma (file-based dbs)
+prisma/*.db
+prisma/*.sqlite
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Misc
+*.log
